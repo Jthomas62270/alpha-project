@@ -41,10 +41,10 @@ char *wish_read_line(FILE *in) {
       fputs(line, stdout); 
       fputs("|*\n", stdout); 
       line[0] == '\0'; 
+      return line;
     }
   }
-
-    return line; 
+  return NULL; 
 }
 
   /*
@@ -78,6 +78,7 @@ int wish_read_config(char *fname, int ok_if_missing) {
   if((ok_if_missing == 0) && (fname != NULL)){
     FILE *in = fopen(fname, "r"); 
     /*char *line[] = wish_read_line(in);*/;
+    /*char *line = wish_read_line(in);*/
   } else if((ok_if_missing == 0) && (fname == NULL)) { 
     perror("File not found...\n"); 
     return 1;  
