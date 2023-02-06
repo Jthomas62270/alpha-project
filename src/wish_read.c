@@ -27,11 +27,9 @@ char *wish_read_line(FILE *in) {
 
     if(len - len_used < chunk_used){
       len *= 2; 
-      if((line = realloc(line, len)) == NULL){
-        fprintf(stderr, "wish : line too long"); 
-        free(line); 
-        exit(1); 
-      }
+      fprintf(stderr, "wish : line too long\n"); 
+      free(line); 
+      exit(1); 
     }
 
     strncpy(line + len_used, chunk, len - len_used); 
@@ -39,8 +37,7 @@ char *wish_read_line(FILE *in) {
 
     if(line[len_used-1] == '\n'){
       fputs(line, stdout); 
-      fputs("|*\n", stdout); 
-      line[0] == '\0'; 
+      len_used -= 1;  
       return line;
     }
   }
@@ -77,8 +74,7 @@ int wish_read_config(char *fname, int ok_if_missing) {
 
   if((ok_if_missing == 0) && (fname != NULL)){
     FILE *in = fopen(fname, "r"); 
-    /*char *line[] = wish_read_line(in);*/;
-    /*char *line = wish_read_line(in);*/
+    char *line = wish_read_line(in);
   } else if((ok_if_missing == 0) && (fname == NULL)) { 
     perror("File not found...\n"); 
     return 1;  
