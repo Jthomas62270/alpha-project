@@ -12,15 +12,15 @@ char *wish_read_line(FILE *in) {
   char chunk[WISH_MAX_INPUT]; 
   
   size_t len = sizeof(chunk); 
-  char *line = malloc(len); 
+  char* line = malloc(len); 
 
   if(line == NULL){
     perror("Unable to allocate memory for line buffer..."); 
     exit(1); 
   }
 
-  line[0] = '\0'; 
-  
+  line[0] = '\0';
+
   while(fgets(chunk, sizeof(chunk), in) != NULL){
     size_t len_used = strlen(line); 
     size_t chunk_used = strlen(chunk); 
@@ -37,38 +37,36 @@ char *wish_read_line(FILE *in) {
 
     if(line[len_used-1] == '\n'){
       fputs(line, stdout); 
-      len_used -= 1;  
+      len_used -= 1; 
       return line;
     }
   }
   return NULL; 
-}
 
-  /*
-  if(read == -1){
-    perror(1); 
-    return NULL; 
-  }
+ /*
+  while(getline(chunk, &len, in)){
+    size_t len_used = strlen(line); 
+    size_t chunk_used = strlen(chunk); 
 
-  if(ptr[read-1]== '\n'){
-    ptr[read-1] = '\0'; 
-  }
+    if(len - len_used < chunk_used){
+      len *= 2; 
+      fprintf(stderr, "wish : line too long\n"); 
+      free(line); 
+      exit(1); 
+    }
 
-  if(read > WISH_MAX_INPUT){
-    free(ptr); 
-    return NULL; 
-  }
+    strncpy(line + len_used, chunk, len - len_used); 
+    len_used += chunk_used; 
 
-  for(int i = 0; i < read - 1; i++){
-    if(isspace(ptr[i])){
-      return ptr; 
+    if(line[len_used-1] == '\n'){
+      // fputs for debugging
+      fputs(line, stdout); 
+      len_used -= 1; 
+      return line;
     }
   }
-
-  free(ptr); 
-  return NULL; 
   */
-
+}
 
 int wish_read_config(char *fname, int ok_if_missing) {
 
