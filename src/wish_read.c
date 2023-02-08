@@ -4,6 +4,40 @@
 
 char *wish_read_line(FILE *in) { 
   
+  if(in == NULL){
+    perror("No line is present..."); 
+    return NULL; 
+  }
+
+  char* buff[WISH_MAX_INPUT];
+  size_t buff_len = sizeof(buff); 
+  char* line = malloc(buff_len); 
+
+  line[0] = '\0'; 
+
+  if(line == NULL){
+    perror("Unable to allocate memory...\n"); 
+    free(line); 
+    return NULL; 
+  }
+
+  size_t len = getline(buff,&buff_len, in);  
+
+  if(len > WISH_MAX_INPUT){ 
+    perror("wish : line too long"); 
+    return NULL; 
+  }
+
+  if(len == 0){ 
+    perror("Buffer is empty"); 
+    return NULL; 
+  }
+
+  strncpy(line, *buff, len-1); 
+  printf("%s\n",line);
+  return line; 
+}
+  /*
   if (in == NULL){
     perror("No line is present..."); 
     return NULL; 
@@ -20,7 +54,7 @@ char *wish_read_line(FILE *in) {
   }
 
   line[0] = '\0'; 
-  
+
   while(fgets(chunk, sizeof(chunk), in) != NULL){
     size_t len_used = strlen(line); 
     size_t chunk_used = strlen(chunk); 
@@ -29,11 +63,15 @@ char *wish_read_line(FILE *in) {
       len *= 2; 
       fprintf(stderr, "wish : line too long\n"); 
       free(line); 
-      exit(1); 
+      return NULL; 
     }
 
-    strncpy(line + len_used, chunk, len - len_used); 
+    strncpy(line + len_used, chunk, len-len_used); 
     len_used += chunk_used; 
+
+     if(*line == '\0'){
+        return NULL; 
+    } 
 
     if(line[len_used-1] == '\n'){
       fputs(line, stdout); 
@@ -43,6 +81,7 @@ char *wish_read_line(FILE *in) {
   }
   return NULL; 
 }
+*/
 
   /*
   if(read == -1){
