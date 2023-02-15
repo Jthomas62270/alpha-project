@@ -1,59 +1,65 @@
-#include "wish.h"
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-char *wish_read_line(FILE *in)
-{
+#include "wish.h"
 
-  if (in == NULL)
-  {
-    perror("No file is present...");
+char *wish_read_line(FILE *in) {
+  char buffer[WISH_MAX_INPUT + 2] = ""; // truncate the buffer
+
+  // Get a string and check its length
+  fgets(buffer, WISH_MAX_INPUT + 2, in);
+  if(strlen(buffer) > WISH_MAX_INPUT) {
+    fputs("wish: line too long\n", stderr);
+
+    // Clean the rest of the line
+    int c = fgetc(in);
+    while (c != '\n' && c != EOF)
+      c = fgetc(in);
     return NULL;
   }
 
-  // declaration
-  char *buff = NULL;
-  // char *line[WISH_MAX_INPUT];
-  size_t len = WISH_MAX_INPUT;
-  size_t buff_used;
+  // Trim the line
+  strtok(buffer, "\n");
 
-  // readline and save it to buffer
-  // param: destination, length of the input, file to stream
-  if ((buff_used = getline(&buff, &len, in)) != 1)
-  {
-    if (buff_used == 0)
-    {
-      perror("No line entered...\n");
-      return NULL;
+  // Check the line for being blank
+  for(size_t i = 0; i < strlen(buffer); ++i) {
+    if(!isspace(buffer[i])) {
+      // Alloate memory
+      char *line = malloc(strlen(buffer) + 1);
+      if (!line) // Too bad
+	abort();
+      strcat(line, buffer);
+      return line;
     }
-
-    if (buff_used > WISH_MAX_INPUT)
-    {
-      fprintf(stderr, "wish : line too long");
-      free(buff);
-      return NULL;
-    }
-    buff[buff_used - 1] = '\0';
   }
-  printf("%s\n", buff);
-  // free(buff);
-  return buff;
+
+  return NULL;
 }
 
-int wish_read_config(char *fname, int ok_if_missing)
-{
+int wish_read_config(char *fname, int ok_if_missing) {
+  FILE *config;
 
-  if ((ok_if_missing == 0) && (fname != NULL))
-  {
-    FILE *in = fopen(fname, "r");
-    char *line = wish_read_line(in);
-    fclose(in);
-  }
-  else if ((ok_if_missing == 0) && (fname == NULL))
-  {
-    perror("File not found...\n");
+  // Check if the file exists
+  if(!(config = fopen(fname, "r"))) {
+    if (ok_if_missing)
+      return 0;
+    // Report missing
+    perror(fname);
     return 1;
   }
 
+  // Read the file line by line
+  while(!feof(config)) {
+    char *line = wish_read_line(config);
+    if(line) {
+#ifdef DEBUG
+      fprintf(stderr, "%s\n", line); // Only for debugging
+#endif
+      free(line);
+    }
+  }
+
+  fclose(config);
   return 0;
 }
