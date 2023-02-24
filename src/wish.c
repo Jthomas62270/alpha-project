@@ -2,6 +2,8 @@
 #include "wish.h"
 
 int wish_parse_command(char *command);
+int wish_exit = 0;
+
 
 int main(int argc, char *argv[])
 {
@@ -9,7 +11,6 @@ int main(int argc, char *argv[])
   // Otherwise, it complains about unused parameters.
   (void)argc;
   (void)argv;
-  // int wish_exit;
   char path[PATH_MAX];
   char *home = getenv("HOME");
 #ifdef DEBUG
@@ -23,10 +24,11 @@ int main(int argc, char *argv[])
   {
     fputs(WISH_DEFAULT_PROMPT, stdout);
     char *line = wish_read_line(stdin);
-    wish_exit = wish_parse_command(line);
-    if (line)
+    if (line){
+      wish_parse_command(line);
       free(line);
-  } while (wish_exit != 0);
+    }
+  } while (wish_exit == 0);
 
   return EXIT_SUCCESS;
 }

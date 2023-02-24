@@ -61,12 +61,13 @@ int wish_read_config(char *fname, int ok_if_missing)
   while (!feof(config))
   {
     char *line = wish_read_line(config);
-    int num = wish_parse_command(line);
+    //puts(line); 
+    if (line)
+    {
+    int num = wish_parse_command(line); 
     if (num == 1){ 
       return 1; 
     }
-    if (line)
-    {
 #ifdef DEBUG
       fprintf(stderr, "%s\n", line); // Only for debugging
 #endif

@@ -12,5 +12,5 @@
 
 char *wish_read_line(FILE *in);
 int wish_read_config(char *fname, int ok_if_missing);
-int static wish_exit;
+int extern wish_exit;
 #endif

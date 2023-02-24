@@ -32,7 +32,7 @@ cmdline:
 | arg YY_SET arg 
 | YY_PWD          
 | YY_CD arg      
-| YY_EXIT        { wish_exit = 0; }
+| YY_EXIT        { wish_exit = 1; }
 
 pipe: 
   YY_BAR out_prog  
