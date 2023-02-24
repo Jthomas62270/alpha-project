@@ -9,8 +9,7 @@ int main(int argc, char *argv[])
   // Otherwise, it complains about unused parameters.
   (void)argc;
   (void)argv;
-
-  int wish_exit;
+  // int wish_exit;
   char path[PATH_MAX];
   char *home = getenv("HOME");
 #ifdef DEBUG

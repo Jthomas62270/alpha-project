@@ -35,7 +35,7 @@ char *wish_read_line(FILE *in)
       char *line = malloc(strlen(buffer) + 1);
       if (!line) // Too bad
         abort();
-      strcat(line, buffer);
+      strcpy(line, buffer);
       return line;
     }
   }
@@ -61,6 +61,10 @@ int wish_read_config(char *fname, int ok_if_missing)
   while (!feof(config))
   {
     char *line = wish_read_line(config);
+    int num = wish_parse_command(line);
+    if (num == 1){ 
+      return 1; 
+    }
     if (line)
     {
 #ifdef DEBUG
