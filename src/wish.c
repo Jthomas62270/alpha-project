@@ -8,7 +8,8 @@ int main()
   // This is just a skeleton for your convenience
   printf(WISH_DEFAULT_PROMPT);
   wish_read_line(stdin);
-  wish_read_config("wish.config", 0);
+  // DZ: The file must be in $HOME
+  wish_read_config("wish.config", 0); // DZ: Must be ABOVE ALL
 
   return EXIT_SUCCESS;
 }
