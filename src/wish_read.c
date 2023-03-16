@@ -4,21 +4,17 @@
 
 #include "wish.h"
 
-int wish_parse_command(char *command);
-
-char *wish_read_line(FILE *in)
-{
+char *wish_read_line(FILE *in) {
   char buffer[WISH_MAX_INPUT + 2] = ""; // truncate the buffer
 
   // Get a string and check its length
   fgets(buffer, WISH_MAX_INPUT + 2, in);
-  if (strlen(buffer) > WISH_MAX_INPUT)
-  {
+  if(strlen(buffer) > WISH_MAX_INPUT) {
     fputs("wish: line too long\n", stderr);
 
     // Clean the rest of the line
     int c = fgetc(in);
-    while (c != '\n' && c != EOF)
+    while (c != '\n' && c != '\r' && c != EOF)
       c = fgetc(in);
     return NULL;
   }
@@ -27,14 +23,12 @@ char *wish_read_line(FILE *in)
   strtok(buffer, "\n");
 
   // Check the line for being blank
-  for (size_t i = 0; i < strlen(buffer); ++i)
-  {
-    if (!isspace(buffer[i]))
-    {
-      // Alloate memory
+  for(size_t i = 0; i < strlen(buffer); ++i) {
+    if(!isspace(buffer[i])) {
+      // Allocate memory
       char *line = malloc(strlen(buffer) + 1);
       if (!line) // Too bad
-        abort();
+	abort();
       strcpy(line, buffer);
       return line;
     }
@@ -43,34 +37,26 @@ char *wish_read_line(FILE *in)
   return NULL;
 }
 
-int wish_read_config(char *fname, int ok_if_missing)
-{
+int wish_read_config(char *fname, int ok_if_missing) {
   FILE *config;
 
   // Check if the file exists
-  if (!(config = fopen(fname, "r")))
-  {
+  if(!(config = fopen(fname, "r"))) {
     if (ok_if_missing)
       return 0;
-    // Report missingm
+    // Report missing
     perror(fname);
     return 1;
   }
 
   // Read the file line by line
-  while (!feof(config))
-  {
+  while(!feof(config)) {
     char *line = wish_read_line(config);
-    //puts(line); 
-    if (line)
-    {
-    int num = wish_parse_command(line); 
-    if (num == 1){ 
-      return 1; 
-    }
+    if(line) {
 #ifdef DEBUG
-      fprintf(stderr, "%s\n", line); // Only for debugging
+      fprintf(stderr, "DEBUG: %s\n", line); // Only for debugging
 #endif
+      wish_parse_command(line);
       free(line);
     }
   }
