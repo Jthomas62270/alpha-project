@@ -13,6 +13,8 @@ static void refuse_to_die()
 
 static void prevent_interruption()
 {
+  fputs("SYSTEM GHOST: Hi, I am `prevent_interruption()`.\nSYSTEM GHOST: When I am implemented, I will install a signal handler,\nSYSTEM GHOST: and you won't be able to use Ctrl+C anymore :P\n", stderr);
+
   struct sigaction sa;
 
   sa.sa_handler = refuse_to_die;
@@ -23,8 +25,6 @@ static void prevent_interruption()
   {
     fputs("Error establishing signal\n", stderr);
   }
-
-  fputs("SYSTEM GHOST: Hi, I am `prevent_interruption()`.\nSYSTEM GHOST: When I am implemented, I will install a signal handler,\nSYSTEM GHOST: and you won't be able to use Ctrl+C anymore :P\n", stderr);
 }
 
 int main(int argc, char *argv[])
