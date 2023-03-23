@@ -1,4 +1,7 @@
 #include <limits.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
 #include "wish.h"
 
 int wish_exit = 0;
@@ -8,7 +11,19 @@ static void refuse_to_die(int sig)
   fputs("Type exit to exit the shell.\n", stderr);
 }
 
-static void prevent_interruption() {
+static void prevent_interruption()
+{
+  struct sigaction sa;
+
+  sa.sa_handler = refuse_to_die();
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+#
+  if (sigaction(SIGINT, &sa, NULL) == -1)
+  {
+    fputs("Error establishing signal\n", stderr);
+  }
+
   fputs("SYSTEM GHOST: Hi, I am `prevent_interruption()`.\nSYSTEM GHOST: When I am implemented, I will install a signal handler,\nSYSTEM GHOST: and you won't be able to use Ctrl+C anymore :P\n", stderr);
 }
 
@@ -26,38 +41,43 @@ int main(int argc, char *argv[])
 #endif
   sprintf(path, "%s/%s", (home ? home : "."), WISH_CONFIG);
   wish_read_config(path, 1);
-  
+
   prevent_interruption();
-  while(!wish_exit) {
+  while (!wish_exit)
+  {
     fputs(WISH_DEFAULT_PROMPT, stdout);
     char *line = wish_read_line(stdin);
-    if(line) {
+    if (line)
+    {
       wish_parse_command(line);
       free(line);
     }
   }
-  
+
   return EXIT_SUCCESS;
 }
-
-char *super_strdup(const char *s) {
+/*
+char *super_strdup(const char *s)
+{
   // Must be implemented
   fputs("\nSYSTEM GHOST: did you just call unimplemented `super_strdup`?\n",
-	stderr);
+        stderr);
   return NULL;
 }
 
-void *super_malloc(size_t size) {
+void *super_malloc(size_t size)
+{
   // Must be implemented
   fputs("\nSYSTEM GHOST: did you just call unimplemented `super_malloc`?\n",
-	stderr);
+        stderr);
   return NULL;
 }
 
-void *super_realloc(void *ptr, size_t size) {
+void *super_realloc(void *ptr, size_t size)
+{
   // Must be implemented
-    fputs("\nSYSTEM GHOST: did you just call unimplemented `realloc`?\n",
-	  stderr);
-    return NULL;
+  fputs("\nSYSTEM GHOST: did you just call unimplemented `realloc`?\n",
+        stderr);
+  return NULL;
 }
-
+*/

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include "wish.h"
 
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
@@ -83,6 +84,29 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
   int status = 0;
   fputs("\nSYSTEM GHOST: Hi, I am `spawn()`.\nSYSTEM GHOST: I am the workhorse of the shell, implement me ASAP!\n",
 	stderr);
+
+  pid_t process_id = fork();
+
+  if(process_id < 0){ 
+    perror("Fork Failed\n"); 
+    return 1; 
+  } else if(process_id == 0) { 
+    //Take exe list and reallocate space to hold our new process 
+    exe->args.args = realloc(exe->args.args, sizeof(exe->args.args + 1) * sizeof(char *));
+    //Make the end of our process lists NULL terminated 
+    exe->args.args[exe->args.size] = NULL;  
+    //
+    int new_ppid = execvp(exe->args.args[0], exe->args.args); 
+    
+    if(new_ppid == -1){ 
+      exit(0); 
+    }
+
+  } else {
+    fputs("Freeing Parent Process", stdout);
+    free_memory(exe, pipe);
+  }
+
   /*
     1. Fork a child process.
 
@@ -100,7 +124,7 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
     You may want to add some printout to the body of the function to
     make sure that it was actually called.  
 
-    5. Report any errors with perror() and return 1 in the parent if
+    5. Report any errors with perror() and. return 1 in the parent if
     there was an error or 0, otherwise.
   */
   return status;
