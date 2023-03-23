@@ -104,7 +104,7 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
 
   } else {
     fputs("Freeing Parent Process", stdout);
-    free_memory(exe, pipe);
+    free_memory(exe, exe);
   }
 
   /*

@@ -6,7 +6,7 @@
 
 int wish_exit = 0;
 
-static void refuse_to_die(int sig)
+static void refuse_to_die()
 {
   fputs("Type exit to exit the shell.\n", stderr);
 }
@@ -15,7 +15,7 @@ static void prevent_interruption()
 {
   struct sigaction sa;
 
-  sa.sa_handler = refuse_to_die();
+  sa.sa_handler = refuse_to_die;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = 0;
 #
