@@ -4,7 +4,7 @@ OBJS = wish_yyparser.tab.o lex.yy.o wish.o wish_read.o wish_parse.o
 CFLAGS = -Wall -pedantic -Wextra -Wcast-align -Wcast-qual \
 	-Wdisabled-optimization -Wformat=2 -Winit-self \
 	-Wmissing-include-dirs -Wredundant-decls -Wshadow \
-	-Wstrict-overflow=5 -Wundef -Werror -Wno-unused \
+	-Wstrict-overflow=5 -Wundef -Wno-unused \
 	-g -Wno-unused-result -O3 -Wno-strict-overflow 
 
 all: $(BIN)

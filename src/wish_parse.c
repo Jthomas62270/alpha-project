@@ -49,7 +49,7 @@ prog_t *last_exe(prog_t *exe) {
 arglist_t add_to_arglist(arglist_t al, char *arg)
 {
   al.size++;      // Increase argument array size
-  al.args = realloc(al.args, sizeof(char*) * al.size); // Add storage
+  al.args = super_realloc(al.args, sizeof(char*) * al.size); // Add storage
   al.args[al.size - 1] = arg;  // Add the last element
   return al;
 }
@@ -57,7 +57,7 @@ arglist_t add_to_arglist(arglist_t al, char *arg)
 arglist_t create_arglist(char *arg)
 {
   arglist_t al;
-  al.args = malloc(sizeof(char*)); // New argument array
+  al.args = super_malloc(sizeof(char*)); // New argument array
   al.args[0] = arg; // Its first element
   al.size = 1;
   return al;
@@ -65,7 +65,7 @@ arglist_t create_arglist(char *arg)
 
 prog_t *create_program(arglist_t al)
 {
-  prog_t *p = malloc(sizeof(prog_t));
+  prog_t *p = super_malloc(sizeof(prog_t));
   p->args = al;
   p->redirection.in = p->redirection.out1 = p->redirection.out2 = NULL;
   p->prev = NULL;
@@ -82,8 +82,8 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
   */
   
   int status = 0;
-  fputs("\nSYSTEM GHOST: Hi, I am `spawn()`.\nSYSTEM GHOST: I am the workhorse of the shell, implement me ASAP!\n",
-	stderr);
+  //fputs("\nSYSTEM GHOST: Hi, I am `spawn()`.\nSYSTEM GHOST: I am the workhorse of the shell, implement me ASAP!\n",
+	//stderr);
 
   pid_t process_id = fork();
 
@@ -92,7 +92,7 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
     return 1; 
   } else if(process_id == 0) { 
     //Take exe list and reallocate space to hold our new process 
-    exe->args.args = realloc(exe->args.args, sizeof(exe->args.args + 1) * sizeof(char *));
+    exe->args.args = super_realloc(exe->args.args, sizeof(exe->args.args + 1) * sizeof(char *));
     //Make the end of our process lists NULL terminated 
     exe->args.args[exe->args.size] = NULL;  
     //
@@ -103,8 +103,8 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
     }
 
   } else {
-    fputs("\nFreeing Parent Process\n", stdout);
-    //free_memory(exe, exe);
+    free_memory(exe, exe);
+    return 1; 
   }
 
   /*
@@ -132,7 +132,7 @@ int spawn(prog_t *exe, int bgmode /* Disregard! */)
 
 void free_memory(prog_t *exe, prog_t *pipe)
 {
-  fputs("\nSYSTEM GHOST: I am a skeleton, just call me where necessary\n",
-	stderr);
+  //fputs("\nSYSTEM GHOST: I am a skeleton, just call me where necessary\n",
+	//stderr);
 }
 
