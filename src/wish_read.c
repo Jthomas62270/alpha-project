@@ -26,7 +26,7 @@ char *wish_read_line(FILE *in) {
   for(size_t i = 0; i < strlen(buffer); ++i) {
     if(!isspace(buffer[i])) {
       // Allocate memory
-      char *line = malloc(strlen(buffer) + 1);
+      char *line = super_malloc(strlen(buffer) + 1);
       if (!line) // Too bad
 	abort();
       strcpy(line, buffer);
