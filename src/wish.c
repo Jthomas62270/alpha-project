@@ -1,31 +1,20 @@
 #include <limits.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <signal.h>
 #include <string.h>
 #include "wish.h"
 
 int wish_exit = 0;
 
-static void refuse_to_die()
+static void refuse_to_die(int sig)
 {
+  (void)sig; // To make macOS compiler happy
   fputs("Type exit to exit the shell.\n", stderr);
 }
 
-static void prevent_interruption()
-{
-  //fputs("SYSTEM GHOST: Hi, I am `prevent_interruption()`.\nSYSTEM GHOST: When I am implemented, I will install a signal handler,\nSYSTEM GHOST: and you won't be able to use Ctrl+C anymore :P\n", stderr);
-
-  struct sigaction sa;
-
-  sa.sa_handler = refuse_to_die;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = 0;
-#
-  if (sigaction(SIGINT, &sa, NULL) == -1)
-  {
-    fputs("Error establishing signal\n", stderr);
-  }
+static void prevent_interruption() {
+  const struct sigaction sa = {.sa_handler = refuse_to_die };
+  if(sigaction(SIGINT, &sa, NULL))
+    perror("sigaction");
 }
 
 int main(int argc, char *argv[])
@@ -42,50 +31,35 @@ int main(int argc, char *argv[])
 #endif
   sprintf(path, "%s/%s", (home ? home : "."), WISH_CONFIG);
   wish_read_config(path, 1);
-
+  
   prevent_interruption();
-  while (!wish_exit)
-  {
+  while(!wish_exit) {
     fputs(WISH_DEFAULT_PROMPT, stdout);
     char *line = wish_read_line(stdin);
-    if (line)
-    {
+    if(line) {
       wish_parse_command(line);
       free(line);
     }
   }
-
+  
   return EXIT_SUCCESS;
 }
 
-char *super_strdup(const char *s)
-{
-  // Must be implemented
-  char *new_str = strdup(s);
-  if (new_str == NULL)
-  {
-    abort();
-  }
-
-  return new_str;
+char *super_strdup(const char *s) {
+  char *s_dup = strdup(s);
+  if(!s_dup) abort();
+  return s_dup;
 }
 
-void *super_malloc(size_t size)
-{
-  void *new_memory = malloc(size);
-  if (new_memory == NULL)
-  {
-    abort();
-  }
-  return new_memory;
+void *super_malloc(size_t size) {
+  void *s = malloc(size);
+  if(!s) abort();
+  return s;
 }
 
-void *super_realloc(void *ptr, size_t size)
-{
-  void *new_memory = realloc(ptr, size);
-  if (new_memory == NULL)
-  {
-    abort();
-  }
-  return new_memory;
+void *super_realloc(void *ptr, size_t size) {
+  void *s = realloc(ptr, size);
+  if(!s) abort();
+  return s;
 }
+
