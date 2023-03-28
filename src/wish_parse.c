@@ -38,6 +38,14 @@ void yyerror(const char* s) {
 }
 
 char *wish_safe_getenv(char *name) {
+
+  char *env = getenv(name);
+
+  if(env == NULL){ 
+    return ""; 
+  } else { 
+    return env; 
+  }
   return NULL;
 }
 
@@ -47,6 +55,14 @@ void wish_assign(char *name, char *value) {
    * The setenv() function returns zero on success,
    * or -1 on error, with errno set to indicate the cause of the error.
    */
+  if(name!=NULL){ 
+    int status = setenv(name, value, 1);
+    if(status == -1){
+      perror("Error: Cannot astablish connection between Variable and Value"); 
+    } 
+  }
+  free(name); 
+  free(value); 
 
 }
 
