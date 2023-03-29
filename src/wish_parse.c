@@ -4,88 +4,111 @@
 #include "wish.h"
 
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
-char *wish_unquote(char * s) {
+char *wish_unquote(char *s)
+{
   int i, j;
-  for (i = 0, j = 0; s[i]; ++i, ++j) {
-    if(s[i] == '\\') {
-      switch(s[++i]) {
-      case 'a': s[j] = '\a'; break;
-      case 'b': s[j] = '\b'; break;
-      case 'f': s[j] = '\f'; break;
-      case 'n': s[j] = '\n'; break;
-      case 'r': s[j] = '\r'; break;
-      case 't': s[j] = '\t'; break;
-      case 'v': s[j] = '\v'; break;
-      case '\\': s[j] = '\\'; break;
-      case '\'': s[j] = '\''; break;
-      case '"': s[j] = '"'; break;
+  for (i = 0, j = 0; s[i]; ++i, ++j)
+  {
+    if (s[i] == '\\')
+    {
+      switch (s[++i])
+      {
+      case 'a':
+        s[j] = '\a';
+        break;
+      case 'b':
+        s[j] = '\b';
+        break;
+      case 'f':
+        s[j] = '\f';
+        break;
+      case 'n':
+        s[j] = '\n';
+        break;
+      case 'r':
+        s[j] = '\r';
+        break;
+      case 't':
+        s[j] = '\t';
+        break;
+      case 'v':
+        s[j] = '\v';
+        break;
+      case '\\':
+        s[j] = '\\';
+        break;
+      case '\'':
+        s[j] = '\'';
+        break;
+      case '"':
+        s[j] = '"';
+        break;
       default:
-	fprintf(stderr, "Invalid escape sequence\n");
-	s[j] = 0;
-	return s;
+        fprintf(stderr, "Invalid escape sequence\n");
+        s[j] = 0;
+        return s;
       }
-    } else { //Simply copy
+    }
+    else
+    { // Simply copy
       s[j] = s[i];
     }
   }
   s[j] = 0; // NULL-terminate the string
-  return s; 
+  return s;
 }
 
 // Do not modify this function
-void yyerror(const char* s) {
+void yyerror(const char *s)
+{
   fprintf(stderr, "Parse error: %s\n", s);
 }
 
-char *wish_safe_getenv(char *name) {
-
+char *wish_safe_getenv(char *name)
+{
   char *env = getenv(name);
-
-  if(env == NULL){ 
-    return ""; 
-  } else { 
-    return env; 
+  if (env == NULL)
+  {
+    return "";
   }
-  return NULL;
+  return env;
 }
 
-void wish_assign(char *name, char *value) {
+void wish_assign(char *name, char *value)
+{
   /* If name does exist in the environment, then its value
    * is changed to value if overwrite is nonzero;
    * The setenv() function returns zero on success,
    * or -1 on error, with errno set to indicate the cause of the error.
    */
-  if(name!=NULL){ 
-    int status = setenv(name, value, 1);
-    if(status == -1){
-      perror("Error: Cannot astablish connection between Variable and Value"); 
-    } 
-  }
-  free(name); 
-  free(value); 
+  setenv(name, value, 1);
 
+  free(name);
+  free(value);
 }
 
 // Find the first program on the command line
-prog_t *last_exe(prog_t *exe) {
-  while(exe->prev) exe = exe->prev;
+prog_t *last_exe(prog_t *exe)
+{
+  while (exe->prev)
+    exe = exe->prev;
   return exe;
 }
 
 // All these implementations are silly but they work
 arglist_t add_to_arglist(arglist_t al, char *arg)
 {
-  al.size++;      // Increase argument array size
-  al.args = super_realloc(al.args, sizeof(char*) * al.size); // Add storage
-  al.args[al.size - 1] = arg;  // Add the last element
+  al.size++;                                                  // Increase argument array size
+  al.args = super_realloc(al.args, sizeof(char *) * al.size); // Add storage
+  al.args[al.size - 1] = arg;                                 // Add the last element
   return al;
 }
 
 arglist_t create_arglist(char *arg)
 {
   arglist_t al;
-  al.args = super_malloc(sizeof(char*)); // New argument array
-  al.args[0] = arg; // Its first element
+  al.args = super_malloc(sizeof(char *)); // New argument array
+  al.args[0] = arg;                       // Its first element
   al.size = 1;
   return al;
 }
@@ -101,6 +124,39 @@ prog_t *create_program(arglist_t al)
 
 int handle_child(pid_t pid, int bgmode)
 {
+
+  if (bgmode == 0)
+  {
+    pid_t new_pid = waitpid(pid, &bgmode, 0);
+
+    if (new_pid == -1)
+    {
+      perror("Error establishing ");
+    }
+    else
+    {
+      if (WIFEXITED(bgmode))
+      {
+        char exit_status[20];
+        sprintf(exit_status, "%d", WEXITSTATUS(bgmode));
+        setenv("_", exit_status, 1);
+      }
+    }
+  }
+
+  /*
+   pid_t new_pid = waitpid(pid, &bgmode, 0);
+
+   if(new_pid == -1){
+
+   }else {
+    if(WIFEXITED(bgmode)){
+      char exit_status[20];
+          sprintf(exit_status, "%d", WEXITSTATUS(bgmode));
+          setenv("_", exit_status, 1);
+    }
+   }
+   */
   return 0;
 }
 
@@ -115,21 +171,22 @@ int spawn(prog_t *exe, int bgmode)
     typedef struct {
     int size;
     char **args;
-    } arglist_t;    
+    } arglist_t;
   */
 
   pid_t pid;
-  switch(pid = fork()) {
+  switch (pid = fork())
+  {
   case -1:
     perror("fork");
     return 1;
-    
+
   case 0: // Child
     exe->args = add_to_arglist(exe->args, NULL);
     execvp(exe->args.args[0], exe->args.args);
     perror(exe->args.args[0]);
     _exit(EXIT_FAILURE); // Do NOT use exit()!
-    
+
   default: // Parent
     return handle_child(pid, bgmode);
   }
@@ -137,9 +194,20 @@ int spawn(prog_t *exe, int bgmode)
 
 void free_memory(prog_t *exe)
 {
-  for(int i = 0; i < exe->args.size; i++)
+  for (int i = 0; i < exe->args.size; i++)
     free(exe->args.args[i]);
   free(exe->args.args);
-  free (exe);
+  if (exe->redirection.in != NULL)
+  {
+    free(exe->redirection.in);
+  }
+  if (exe->redirection.out1 != NULL)
+  {
+    free(exe->redirection.in);
+  }
+  if (exe->redirection.out2 != NULL)
+  {
+    free(exe->redirection.in);
+  }
+  free(exe);
 }
-
